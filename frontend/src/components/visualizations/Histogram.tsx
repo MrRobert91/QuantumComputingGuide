@@ -10,18 +10,18 @@ export function Histogram({ counts, title = "Measurement counts" }: Props) {
   const max = Math.max(...entries.map(([, v]) => v), 1);
 
   return (
-    <div className="rounded-xl bg-black/30 border border-white/10 p-4">
+    <div className="card-muted p-4">
       <h4 className="text-sm font-semibold text-gray-300 mb-3">{title}</h4>
-      <div className="flex items-end gap-3 h-48">
+      <div className="flex items-end gap-2 sm:gap-3 h-48 overflow-x-auto">
         {entries.map(([label, value]) => {
           const heightPct = (value / max) * 100;
           const prob = ((value / total) * 100).toFixed(1);
           return (
-            <div key={label} className="flex flex-col items-center flex-1 min-w-[2rem]">
+            <div key={label} className="flex flex-col items-center flex-1 min-w-[2.25rem]">
               <span className="text-xs text-quantum-accent2 mb-1">{prob}%</span>
               <div className="w-full flex items-end h-full">
                 <div
-                  className="w-full bg-gradient-to-t from-quantum-accent to-quantum-accent2 rounded-t"
+                  className="w-full bg-gradient-to-t from-quantum-accent to-quantum-accent2 rounded-t-md transition-all duration-500"
                   style={{ height: `${heightPct}%` }}
                   title={`${value} shots`}
                 />

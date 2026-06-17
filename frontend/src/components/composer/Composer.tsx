@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { ComposerCircuit, GateOp } from "../../api/types";
 
 const ONE_Q = ["h", "x", "y", "z", "s", "sdg", "t", "tdg", "sx", "id"];
@@ -12,17 +12,25 @@ interface Props {
 }
 
 export function Composer({ circuit, onChange }: Props) {
-  const [activeGate, setActiveGate] = useState<string | null>("h");
+  const [activeGate, setActiveGate] = useState<string>("h");
   const [angle, setAngle] = useState<string>("pi/2");
   const [pending, setPending] = useState<{ q: number; col: number } | null>(null);
 
   const opAt = (q: number, col: number): GateOp | undefined =>
     circuit.ops.find((o) => o.column === col && o.qubits.includes(q));
 
+  // Does a two-qubit op in this column span across qubit row `q`? (for the connector line)
+  const connectorAt = (q: number, col: number): boolean =>
+    circuit.ops.some((o) => {
+      if (o.column !== col || !TWO_Q.includes(o.name)) return false;
+      const lo = Math.min(...o.qubits);
+      const hi = Math.max(...o.qubits);
+      return q > lo && q <= hi;
+    });
+
   const parseAngle = (s: string): number => {
     const expr = s.trim().toLowerCase().replace(/pi/g, String(Math.PI));
     try {
-      // Only digits, operators, dot, and the substituted pi value remain.
       if (!/^[-+*/(). 0-9]+$/.test(expr)) return Math.PI / 2;
       // eslint-disable-next-line no-new-func
       return Function(`"use strict";return (${expr})`)();
@@ -31,17 +39,14 @@ export function Composer({ circuit, onChange }: Props) {
     }
   };
 
-  const setCircuit = (ops: GateOp[]) => onChange({ ...circuit, ops });
+  const setOps = (ops: GateOp[]) => onChange({ ...circuit, ops });
 
   const handleCellClick = (q: number, col: number) => {
     const existing = opAt(q, col);
     if (existing && !pending) {
-      // Remove the operation occupying this cell.
-      setCircuit(circuit.ops.filter((o) => o !== existing));
+      setOps(circuit.ops.filter((o) => o !== existing));
       return;
     }
-    if (!activeGate) return;
-
     if (TWO_Q.includes(activeGate)) {
       if (!pending) {
         setPending({ q, col });
@@ -51,25 +56,21 @@ export function Composer({ circuit, onChange }: Props) {
         setPending(null);
         return;
       }
-      const op: GateOp = { name: activeGate, qubits: [pending.q, q], column: pending.col };
-      setCircuit([...circuit.ops, op]);
+      setOps([...circuit.ops, { name: activeGate, qubits: [pending.q, q], column: pending.col }]);
       setPending(null);
       return;
     }
-
     if (activeGate === "measure") {
-      const clbits = Math.max(circuit.num_clbits, q + 1);
       onChange({
         ...circuit,
-        num_clbits: clbits,
+        num_clbits: Math.max(circuit.num_clbits, q + 1),
         ops: [...circuit.ops, { name: "measure", qubits: [q], clbit: q, column: col }],
       });
       return;
     }
-
     const op: GateOp = { name: activeGate, qubits: [q], column: col };
     if (PARAM_Q.includes(activeGate)) op.params = [parseAngle(angle)];
-    setCircuit([...circuit.ops, op]);
+    setOps([...circuit.ops, op]);
   };
 
   const setQubits = (n: number) => {
@@ -87,94 +88,87 @@ export function Composer({ circuit, onChange }: Props) {
         setActiveGate(g);
         setPending(null);
       }}
-      className={`px-2.5 py-1.5 rounded text-sm font-mono ${
-        activeGate === g ? "bg-quantum-accent text-white" : "bg-white/10 hover:bg-white/20"
+      className={`gate-btn ${
+        activeGate === g
+          ? "bg-quantum-accent text-white shadow-glow"
+          : "bg-white/8 text-gray-200 hover:bg-white/15"
       }`}
     >
       {g}
     </button>
   );
 
+  const renderToken = (q: number, op: GateOp) => {
+    if (TWO_Q.includes(op.name)) {
+      const isFirst = op.qubits[0] === q;
+      if (op.name === "swap") return <Sym>×</Sym>;
+      if (op.name === "cz") return <Dot />;
+      // cx: control dot on first, ⊕ on target
+      return isFirst ? <Dot /> : <Sym>⊕</Sym>;
+    }
+    if (op.name === "measure") return <Sym className="text-quantum-accent2">M</Sym>;
+    return (
+      <span className="px-1.5 py-1 rounded-md bg-quantum-accent/80 text-white text-xs font-mono">
+        {op.name}
+      </span>
+    );
+  };
+
   return (
-    <div className="rounded-xl border border-white/10 bg-quantum-panel/60 p-4">
+    <div className="card p-4">
       {/* Palette */}
-      <div className="flex flex-wrap items-center gap-2 mb-4">
-        {ONE_Q.map((g) => (
+      <div className="flex flex-wrap items-center gap-1.5 mb-4">
+        {[...ONE_Q, ...PARAM_Q, ...TWO_Q, "measure"].map((g) => (
           <GateBtn key={g} g={g} />
         ))}
-        {PARAM_Q.map((g) => (
-          <GateBtn key={g} g={g} />
-        ))}
-        {TWO_Q.map((g) => (
-          <GateBtn key={g} g={g} />
-        ))}
-        <GateBtn g="measure" />
-        <label className="ml-2 text-xs text-gray-400 flex items-center gap-1">
+        <label className="ml-1 text-xs text-gray-400 flex items-center gap-1.5">
           angle
           <input
             value={angle}
             onChange={(e) => setAngle(e.target.value)}
-            className="w-20 bg-black/40 rounded px-2 py-1 text-xs font-mono"
+            className="w-20 bg-black/40 border border-white/10 rounded px-2 py-1 text-sm font-mono"
           />
         </label>
       </div>
 
       {pending && (
         <p className="text-xs text-quantum-accent2 mb-2">
-          Two-qubit gate: control set on q{pending.q}. Click another qubit for the target.
+          Two-qubit gate: control set on q{pending.q}. Tap another qubit (same column) for the target.
         </p>
       )}
 
       {/* Qubit count */}
       <div className="flex items-center gap-2 mb-3 text-sm">
-        <span className="text-gray-400">Qubits:</span>
-        <button onClick={() => setQubits(circuit.num_qubits - 1)} className="px-2 bg-white/10 rounded">
-          −
-        </button>
-        <span className="font-mono">{circuit.num_qubits}</span>
-        <button onClick={() => setQubits(circuit.num_qubits + 1)} className="px-2 bg-white/10 rounded">
-          +
-        </button>
-        <button
-          onClick={() => onChange({ ...circuit, ops: [] })}
-          className="ml-3 px-2 py-1 bg-red-500/30 hover:bg-red-500/50 rounded text-xs"
-        >
+        <span className="text-gray-400">Qubits</span>
+        <button onClick={() => setQubits(circuit.num_qubits - 1)} className="btn-ghost !min-h-0 !px-3 !py-1">−</button>
+        <span className="font-mono w-5 text-center">{circuit.num_qubits}</span>
+        <button onClick={() => setQubits(circuit.num_qubits + 1)} className="btn-ghost !min-h-0 !px-3 !py-1">+</button>
+        <button onClick={() => onChange({ ...circuit, ops: [] })} className="btn-danger !min-h-0 !px-3 !py-1 ml-2 text-xs">
           Clear
         </button>
       </div>
 
       {/* Grid */}
-      <div className="overflow-x-auto">
-        <div className="inline-block">
+      <div className="overflow-x-auto -mx-1 px-1" style={{ WebkitOverflowScrolling: "touch" }}>
+        <div className="inline-block min-w-max">
           {Array.from({ length: circuit.num_qubits }).map((_, q) => (
             <div key={q} className="flex items-center">
-              <span className="w-10 text-xs font-mono text-gray-500">q{q}</span>
-              <div className="flex">
+              <span className="w-9 shrink-0 text-xs font-mono text-gray-500">q{q}</span>
+              <div className="flex relative">
+                {/* horizontal qubit wire */}
+                <div className="absolute left-0 right-0 top-1/2 h-px bg-white/10" />
                 {Array.from({ length: NUM_COLS }).map((_, col) => {
                   const op = opAt(q, col);
-                  const isControl = op && TWO_Q.includes(op.name) && op.qubits[0] === q;
-                  const isTarget = op && TWO_Q.includes(op.name) && op.qubits[1] === q;
                   return (
                     <button
                       key={col}
                       onClick={() => handleCellClick(q, col)}
-                      className="w-12 h-12 m-0.5 rounded border border-white/5 bg-black/20 hover:border-quantum-accent/60 flex items-center justify-center text-xs font-mono"
+                      className="relative w-11 h-11 m-0.5 shrink-0 rounded-lg border border-white/5 bg-black/20 hover:border-quantum-accent/60 hover:bg-black/30 flex items-center justify-center transition-colors"
                     >
-                      {op ? (
-                        isControl ? (
-                          <span className="w-3 h-3 rounded-full bg-quantum-accent2" />
-                        ) : isTarget ? (
-                          <span className="text-quantum-accent2">⊕</span>
-                        ) : op.name === "measure" ? (
-                          <span className="text-quantum-accent2">M</span>
-                        ) : (
-                          <span className="px-1 py-0.5 rounded bg-quantum-accent/70">
-                            {op.name}
-                          </span>
-                        )
-                      ) : (
-                        ""
+                      {connectorAt(q, col) && (
+                        <span className="absolute left-1/2 -top-1 -translate-x-1/2 w-0.5 h-[calc(100%+0.5rem)] bg-quantum-accent2/70" />
                       )}
+                      {op && <span className="relative z-10">{renderToken(q, op)}</span>}
                     </button>
                   );
                 })}
@@ -184,8 +178,15 @@ export function Composer({ circuit, onChange }: Props) {
         </div>
       </div>
       <p className="text-xs text-gray-500 mt-2">
-        Click a cell to place the selected gate. Click a placed gate to remove it.
+        Tap a cell to place the selected gate · tap a placed gate to remove it.
       </p>
     </div>
   );
+}
+
+function Dot() {
+  return <span className="w-3 h-3 rounded-full bg-quantum-accent2" />;
+}
+function Sym({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <span className={`text-quantum-accent2 text-lg leading-none ${className}`}>{children}</span>;
 }

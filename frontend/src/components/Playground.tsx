@@ -74,33 +74,36 @@ export function Playground({ initialCircuit }: Props) {
   };
 
   return (
-    <div className="grid lg:grid-cols-2 gap-6">
+    <div className="grid lg:grid-cols-2 gap-5 lg:gap-6">
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <button
-            onClick={() => setTab("composer")}
-            className={`px-3 py-1.5 rounded text-sm ${
-              tab === "composer" ? "bg-quantum-accent text-white" : "bg-white/10"
-            }`}
-          >
-            Composer
-          </button>
-          <button
-            onClick={() => setTab("code")}
-            className={`px-3 py-1.5 rounded text-sm ${
-              tab === "code" ? "bg-quantum-accent text-white" : "bg-white/10"
-            }`}
-          >
-            Code
-          </button>
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          {/* Segmented tabs */}
+          <div className="inline-flex rounded-lg bg-black/30 border border-white/10 p-1">
+            <button
+              onClick={() => setTab("composer")}
+              className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
+                tab === "composer" ? "bg-quantum-accent text-white" : "text-gray-300 hover:text-white"
+              }`}
+            >
+              Composer
+            </button>
+            <button
+              onClick={() => setTab("code")}
+              className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
+                tab === "code" ? "bg-quantum-accent text-white" : "text-gray-300 hover:text-white"
+              }`}
+            >
+              Code
+            </button>
+          </div>
 
-          <div className="ml-auto flex items-center gap-2 text-sm">
+          <div className="ml-auto">
             {tab === "composer" ? (
-              <button onClick={generateCode} className="px-3 py-1.5 rounded bg-white/10 hover:bg-white/20">
+              <button onClick={generateCode} className="btn-ghost !min-h-0 !py-1.5 text-sm">
                 Generate code →
               </button>
             ) : (
-              <button onClick={renderCircuit} className="px-3 py-1.5 rounded bg-white/10 hover:bg-white/20">
+              <button onClick={renderCircuit} className="btn-ghost !min-h-0 !py-1.5 text-sm">
                 ← Render circuit
               </button>
             )}
@@ -114,11 +117,7 @@ export function Playground({ initialCircuit }: Props) {
         )}
 
         <div className="flex flex-wrap items-center gap-3 mt-4">
-          <button
-            onClick={run}
-            disabled={busy}
-            className="px-4 py-2 rounded bg-quantum-accent2 text-black font-semibold disabled:opacity-50"
-          >
+          <button onClick={run} disabled={busy} className="btn-accent">
             {busy ? "Running…" : "▶ Run"}
           </button>
 
@@ -129,7 +128,7 @@ export function Playground({ initialCircuit }: Props) {
               min={1}
               value={shots}
               onChange={(e) => setShots(Number(e.target.value))}
-              className="w-24 bg-black/40 rounded px-2 py-1 text-sm"
+              className="w-24 bg-black/40 border border-white/10 rounded px-2 py-1.5 text-sm"
             />
           </label>
 
@@ -138,7 +137,7 @@ export function Playground({ initialCircuit }: Props) {
             <select
               value={preferredMode}
               onChange={(e) => setMode(e.target.value)}
-              className="bg-black/40 rounded px-2 py-1 text-sm"
+              className="bg-black/40 border border-white/10 rounded px-2 py-1.5 text-sm"
             >
               <option value="aer">Aer (local)</option>
               <option value="ibm" disabled={!ibmEnabled}>
@@ -148,16 +147,20 @@ export function Playground({ initialCircuit }: Props) {
           </label>
         </div>
 
-        {error && <p className="text-sm text-red-400 mt-3">{error}</p>}
+        {error && (
+          <p className="text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mt-3">
+            {error}
+          </p>
+        )}
       </div>
 
       <div>
         {result ? (
           <ResultPanel result={result} />
         ) : (
-          <div className="rounded-xl border border-dashed border-white/10 p-8 text-center text-gray-500">
-            Build a circuit and press <span className="text-quantum-accent2">Run</span> to see
-            measurement counts, amplitudes, and Bloch spheres.
+          <div className="rounded-2xl border border-dashed border-white/15 p-8 text-center text-gray-500">
+            Build a circuit and press <span className="text-quantum-accent2 font-medium">Run</span> to
+            see measurement counts, amplitudes, and Bloch spheres.
           </div>
         )}
       </div>

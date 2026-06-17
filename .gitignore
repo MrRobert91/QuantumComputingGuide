@@ -20,3 +20,6 @@ venv/
 .idea/
 .vscode/
 *.log
+
+# TS build info
+frontend/tsconfig.tsbuildinfo

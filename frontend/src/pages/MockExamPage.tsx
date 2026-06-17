@@ -9,22 +9,20 @@ export function MockExamPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-2">Mock exam</h1>
-      <p className="text-gray-400 mb-6">
+      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Mock exam</h1>
+      <p className="text-gray-400 mb-6 text-[15px]">
         Sample multiple-choice questions in the style of the certification. Answer them all, then
         submit to see your score and explanations.
       </p>
 
-      <div className="space-y-5">
+      <div className="space-y-4">
         {examQuestions.map((q, i) => (
-          <div key={q.id} className="rounded-xl bg-quantum-panel/60 border border-white/10 p-5">
+          <div key={q.id} className="card p-4 sm:p-5">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs px-2 py-0.5 rounded bg-quantum-accent/20 text-quantum-accent2">
-                {q.topic}
-              </span>
+              <span className="chip">{q.topic}</span>
               <span className="text-xs text-gray-500">Question {i + 1}</span>
             </div>
-            <p className="text-white mb-3">{q.question}</p>
+            <p className="text-white mb-3 font-medium">{q.question}</p>
             <div className="space-y-2">
               {q.options.map((opt, idx) => {
                 const chosen = answers[q.id] === idx;
@@ -33,7 +31,7 @@ export function MockExamPage() {
                 return (
                   <label
                     key={idx}
-                    className={`flex items-center gap-2 px-3 py-2 rounded border cursor-pointer text-sm ${
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border cursor-pointer text-sm transition-colors ${
                       correct
                         ? "border-green-500 bg-green-500/10"
                         : wrong
@@ -46,17 +44,18 @@ export function MockExamPage() {
                     <input
                       type="radio"
                       name={q.id}
+                      className="accent-quantum-accent"
                       checked={chosen}
                       disabled={submitted}
                       onChange={() => setAnswers((a) => ({ ...a, [q.id]: idx }))}
                     />
-                    {opt}
+                    <span>{opt}</span>
                   </label>
                 );
               })}
             </div>
             {submitted && (
-              <p className="text-xs text-gray-400 mt-3 bg-black/30 rounded px-3 py-2">
+              <p className="text-xs text-gray-400 mt-3 bg-black/30 border border-white/10 rounded-lg px-3 py-2">
                 {q.explanation}
               </p>
             )}
@@ -64,25 +63,22 @@ export function MockExamPage() {
         ))}
       </div>
 
-      <div className="mt-6 flex items-center gap-4">
+      <div className="mt-6 flex items-center gap-4 flex-wrap">
         {!submitted ? (
-          <button
-            onClick={() => setSubmitted(true)}
-            className="px-5 py-2 rounded bg-quantum-accent2 text-black font-semibold"
-          >
+          <button onClick={() => setSubmitted(true)} className="btn-accent">
             Submit
           </button>
         ) : (
           <>
             <span className="text-lg font-semibold text-white">
-              Score: {score}/{examQuestions.length}
+              Score: <span className="text-quantum-accent2">{score}</span>/{examQuestions.length}
             </span>
             <button
               onClick={() => {
                 setSubmitted(false);
                 setAnswers({});
               }}
-              className="px-4 py-2 rounded bg-white/10 hover:bg-white/20 text-sm"
+              className="btn-ghost"
             >
               Retry
             </button>
