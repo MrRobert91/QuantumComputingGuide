@@ -66,6 +66,23 @@ npm test                                # run frontend tests
 npm run build                           # production build
 ```
 
+## Deploying the two services separately (e.g. Sliplane, no compose)
+
+When you can't use docker-compose, deploy each image as its own service:
+
+1. **Backend** — deploy `backend/`. Note its public URL (e.g. `https://your-backend.sliplane.app`).
+   Optionally set `IBM_QUANTUM_TOKEN`.
+2. **Frontend** — deploy `frontend/` and set the **`BACKEND_URL`** environment variable to the
+   backend's base origin (no trailing slash, no `/api`):
+
+   ```
+   BACKEND_URL=https://your-backend.sliplane.app
+   ```
+
+The frontend's nginx config is a template; `BACKEND_URL` is substituted at container start, so
+`/api` requests are proxied to your backend. Because the browser only ever talks to the frontend
+origin (`/api` is proxied server-side), you don't need to configure CORS for this setup.
+
 ## IBM Quantum (optional)
 
 Set `IBM_QUANTUM_TOKEN` (from https://quantum.ibm.com/) in `.env`. The app then offers an
