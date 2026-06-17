@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Env
+.env
+*.local
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.log

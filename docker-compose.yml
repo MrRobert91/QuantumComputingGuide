@@ -1,0 +1,28 @@
+# Orchestrates the two independently-built services.
+#
+#   Production-like:  docker compose up --build
+#       frontend (nginx) on http://localhost:8080  ->  proxies /api to backend
+#       backend (FastAPI) on http://localhost:8000
+#
+#   Set IBM_QUANTUM_TOKEN in a .env file (see .env.example) to enable the
+#   "IBM Quantum" execution mode.
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      IBM_QUANTUM_TOKEN: ${IBM_QUANTUM_TOKEN:-}
+      IBM_QUANTUM_CHANNEL: ${IBM_QUANTUM_CHANNEL:-ibm_quantum_platform}
+      IBM_QUANTUM_INSTANCE: ${IBM_QUANTUM_INSTANCE:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080,http://localhost}
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

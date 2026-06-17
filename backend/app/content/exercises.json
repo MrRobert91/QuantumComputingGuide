@@ -1,0 +1,72 @@
+[
+  {
+    "id": "ex-plus-state",
+    "module": "foundations",
+    "title": "Create a |+> state",
+    "prompt": "Take qubit 0 from |0> into an equal superposition (the |+> state) so that measuring it gives 0 and 1 with equal probability.",
+    "difficulty": "easy",
+    "num_qubits": 1,
+    "hints": ["A single gate creates an equal superposition.", "The Hadamard gate (H) maps |0> to |+>."],
+    "starting_composer": {"num_qubits": 1, "num_clbits": 0, "ops": []},
+    "solution": {"num_qubits": 1, "num_clbits": 0, "ops": [{"name": "h", "qubits": [0], "column": 0}]},
+    "links": [
+      {"label": "Single-qubit gates (Qiskit docs)", "url": "https://docs.quantum.ibm.com/build/circuit-construction"}
+    ]
+  },
+  {
+    "id": "ex-bit-flip",
+    "module": "gates",
+    "title": "Flip a qubit to |1>",
+    "prompt": "Apply the gate that deterministically turns |0> into |1>.",
+    "difficulty": "easy",
+    "num_qubits": 1,
+    "hints": ["This is the quantum NOT gate.", "Use the Pauli-X gate."],
+    "starting_composer": {"num_qubits": 1, "num_clbits": 0, "ops": []},
+    "solution": {"num_qubits": 1, "num_clbits": 0, "ops": [{"name": "x", "qubits": [0], "column": 0}]},
+    "links": [
+      {"label": "Pauli gates (Qiskit docs)", "url": "https://docs.quantum.ibm.com/build/circuit-construction"}
+    ]
+  },
+  {
+    "id": "ex-minus-state",
+    "module": "gates",
+    "title": "Create a |-> state",
+    "prompt": "Starting from |0>, produce the |-> state (equal superposition with a relative phase of -1 on |1>).",
+    "difficulty": "medium",
+    "num_qubits": 1,
+    "hints": ["First flip to |1>, then apply Hadamard.", "X then H maps |0> -> |->."],
+    "starting_composer": {"num_qubits": 1, "num_clbits": 0, "ops": []},
+    "solution": {"num_qubits": 1, "num_clbits": 0, "ops": [{"name": "x", "qubits": [0], "column": 0}, {"name": "h", "qubits": [0], "column": 1}]},
+    "links": [
+      {"label": "The Bloch sphere", "url": "https://learning.quantum.ibm.com/"}
+    ]
+  },
+  {
+    "id": "ex-bell-state",
+    "module": "circuits",
+    "title": "Create a Bell state",
+    "prompt": "Build the |Φ+> Bell state on two qubits: put qubit 0 in superposition and entangle it with qubit 1.",
+    "difficulty": "medium",
+    "num_qubits": 2,
+    "hints": ["Start with a Hadamard on qubit 0.", "Then apply a CNOT with control 0 and target 1."],
+    "starting_composer": {"num_qubits": 2, "num_clbits": 0, "ops": []},
+    "solution": {"num_qubits": 2, "num_clbits": 0, "ops": [{"name": "h", "qubits": [0], "column": 0}, {"name": "cx", "qubits": [0, 1], "column": 1}]},
+    "links": [
+      {"label": "Entanglement & Bell states", "url": "https://learning.quantum.ibm.com/"}
+    ]
+  },
+  {
+    "id": "ex-ghz-state",
+    "module": "circuits",
+    "title": "Create a 3-qubit GHZ state",
+    "prompt": "Extend the Bell-state idea to three qubits to build the GHZ state (|000> + |111>)/√2.",
+    "difficulty": "medium",
+    "num_qubits": 3,
+    "hints": ["Hadamard on qubit 0.", "Chain CNOTs: 0->1, then 1->2."],
+    "starting_composer": {"num_qubits": 3, "num_clbits": 0, "ops": []},
+    "solution": {"num_qubits": 3, "num_clbits": 0, "ops": [{"name": "h", "qubits": [0], "column": 0}, {"name": "cx", "qubits": [0, 1], "column": 1}, {"name": "cx", "qubits": [1, 2], "column": 2}]},
+    "links": [
+      {"label": "GHZ states", "url": "https://learning.quantum.ibm.com/"}
+    ]
+  }
+]

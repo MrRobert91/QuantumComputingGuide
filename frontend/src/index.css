@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-color: #0b0f1a;
+  color: #e5e7eb;
+}
+
+/* Markdown prose styling for theory pages */
+.prose-quantum h1 { @apply text-3xl font-bold mt-2 mb-4 text-white; }
+.prose-quantum h2 { @apply text-2xl font-semibold mt-8 mb-3 text-white; }
+.prose-quantum h3 { @apply text-xl font-semibold mt-6 mb-2 text-quantum-accent2; }
+.prose-quantum p { @apply my-3 leading-7 text-gray-300; }
+.prose-quantum ul { @apply list-disc pl-6 my-3 text-gray-300 space-y-1; }
+.prose-quantum ol { @apply list-decimal pl-6 my-3 text-gray-300 space-y-1; }
+.prose-quantum code { @apply bg-black/40 px-1.5 py-0.5 rounded text-quantum-accent2 text-sm; }
+.prose-quantum pre { @apply bg-black/50 p-4 rounded-lg overflow-x-auto my-4 text-sm; }
+.prose-quantum pre code { @apply bg-transparent p-0 text-gray-200; }
+.prose-quantum a { @apply text-quantum-accent underline hover:text-quantum-accent2; }
+.prose-quantum blockquote { @apply border-l-4 border-quantum-accent pl-4 italic text-gray-400 my-4; }
+.prose-quantum table { @apply w-full my-4 border-collapse text-sm; }
+.prose-quantum th, .prose-quantum td { @apply border border-white/10 px-3 py-2 text-left; }
+.prose-quantum strong { @apply text-white; }
