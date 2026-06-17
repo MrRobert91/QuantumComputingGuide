@@ -23,6 +23,9 @@ services:
     build: ./frontend
     ports:
       - "8080:80"
+    environment:
+      # Backend base origin (no trailing slash, no /api). nginx proxies /api here.
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8000}
     depends_on:
       - backend
     restart: unless-stopped
