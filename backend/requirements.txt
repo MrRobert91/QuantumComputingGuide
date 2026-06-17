@@ -1,0 +1,11 @@
+# Pinned to Qiskit 2.x to match the v2.X Developer certification.
+# Lower bounds keep Docker builds resilient while staying within the 2.x line.
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.34,<1.0
+pydantic>=2.10,<3.0
+pydantic-settings>=2.7,<3.0
+numpy>=1.26,<3.0
+qiskit>=2.0,<3.0
+qiskit-aer>=0.15
+qiskit-ibm-runtime>=0.30
+qiskit-qasm3-import>=0.5
