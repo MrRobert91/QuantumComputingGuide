@@ -14,9 +14,9 @@ const GATES: { name: GateName; label: string; theta?: number }[] = [
   { name: "s", label: "S" },
   { name: "t", label: "T" },
   { name: "sx", label: "√X" },
-  { name: "rx", label: "RX(π/2)", theta: Math.PI / 2 },
-  { name: "ry", label: "RY(π/2)", theta: Math.PI / 2 },
-  { name: "rz", label: "RZ(π/2)", theta: Math.PI / 2 },
+  { name: "rx", label: "Rx", theta: Math.PI / 2 },
+  { name: "ry", label: "Ry", theta: Math.PI / 2 },
+  { name: "rz", label: "Rz", theta: Math.PI / 2 },
 ];
 
 export function InteractiveQubit({ variant }: { variant: Variant }) {
@@ -31,90 +31,99 @@ export function InteractiveQubit({ variant }: { variant: Variant }) {
     { basis: "1", real: state[1].re, imag: state[1].im, probability: p1, phase: phase(state[1]) },
   ].filter((a) => a.probability > 1e-9);
 
-  const showGates = variant === "gates" || variant === "bloch";
-  const showBloch = variant === "bloch" || variant === "gates";
-  const showAmps = variant === "amplitudes" || variant === "gates";
+  const isSuperposition = variant === "superposition";
 
   return (
-    <div className="my-6 rounded-2xl border border-white/10 bg-quantum-panel/60 p-5">
-      <div className="grid md:grid-cols-2 gap-5">
-        {showBloch && <BlochSphere vector={bloch} />}
+    <div className="my-6 card p-4 sm:p-5 animate-pop-in">
+      <div className="grid md:grid-cols-2 gap-4 sm:gap-5">
+        <div>
+          <BlochSphere vector={bloch} />
+          <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs font-mono text-gray-400">
+            <span>x {bloch.x.toFixed(2)}</span>
+            <span>y {bloch.y.toFixed(2)}</span>
+            <span>z {bloch.z.toFixed(2)}</span>
+          </div>
+        </div>
 
         <div className="flex flex-col gap-4">
-          {variant === "superposition" && (
-            <div className="rounded-xl bg-black/30 border border-white/10 p-4">
+          {isSuperposition ? (
+            <div className="card-muted p-4">
               <p className="text-sm text-gray-300 mb-3">
                 Toggle a Hadamard to move between a definite state and an equal superposition.
               </p>
-              <div className="flex gap-2">
-                <button
-                  className="px-3 py-2 rounded bg-quantum-accent/80 hover:bg-quantum-accent text-sm"
-                  onClick={() => setSeq([{ name: "h" }])}
-                >
+              <div className="flex flex-wrap gap-2">
+                <button className="btn-primary" onClick={() => setSeq([{ name: "h" }])}>
                   Apply H → |+⟩
                 </button>
-                <button
-                  className="px-3 py-2 rounded bg-white/10 hover:bg-white/20 text-sm"
-                  onClick={() => setSeq([])}
-                >
+                <button className="btn-ghost" onClick={() => setSeq([])}>
                   Reset → |0⟩
                 </button>
               </div>
             </div>
-          )}
-
-          <div className="rounded-xl bg-black/30 border border-white/10 p-4">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-400">P(0)</span>
-              <span className="font-mono text-quantum-accent2">{(p0 * 100).toFixed(1)}%</span>
-            </div>
-            <div className="h-2 rounded bg-white/10 overflow-hidden mb-3">
-              <div className="h-full bg-quantum-accent2" style={{ width: `${p0 * 100}%` }} />
-            </div>
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-400">P(1)</span>
-              <span className="font-mono text-quantum-accent2">{(p1 * 100).toFixed(1)}%</span>
-            </div>
-            <div className="h-2 rounded bg-white/10 overflow-hidden">
-              <div className="h-full bg-quantum-accent" style={{ width: `${p1 * 100}%` }} />
-            </div>
-          </div>
-
-          {showGates && (
-            <div className="rounded-xl bg-black/30 border border-white/10 p-4">
+          ) : (
+            <div className="card-muted p-4">
               <p className="text-xs text-gray-400 mb-2">Apply a gate:</p>
               <div className="flex flex-wrap gap-2">
                 {GATES.map((g, i) => (
                   <button
                     key={`${g.name}-${i}`}
-                    className="px-2.5 py-1.5 rounded bg-white/10 hover:bg-quantum-accent/60 text-sm font-mono"
+                    className="gate-btn bg-white/8 text-gray-100 hover:bg-quantum-accent/60"
                     onClick={() => setSeq((s) => [...s, { name: g.name, theta: g.theta }])}
                   >
                     {g.label}
                   </button>
                 ))}
+              </div>
+              <div className="flex gap-2 mt-3">
                 <button
-                  className="px-2.5 py-1.5 rounded bg-red-500/30 hover:bg-red-500/50 text-sm"
+                  className="btn-ghost !min-h-0 !py-1.5 text-xs"
+                  onClick={() => setSeq((s) => s.slice(0, -1))}
+                  disabled={seq.length === 0}
+                >
+                  ↶ Undo
+                </button>
+                <button
+                  className="btn-ghost !min-h-0 !py-1.5 text-xs"
                   onClick={() => setSeq([])}
+                  disabled={seq.length === 0}
                 >
                   Reset
                 </button>
               </div>
               {seq.length > 0 && (
-                <p className="text-xs text-gray-500 mt-3 font-mono">
-                  Sequence: {seq.map((g) => g.name.toUpperCase()).join(" · ")}
+                <p className="text-xs text-gray-500 mt-3 font-mono break-words">
+                  {seq.map((g) => g.name.toUpperCase()).join(" · ")}
                 </p>
               )}
             </div>
           )}
+
+          {/* Probabilities */}
+          <div className="card-muted p-4">
+            <ProbBar label="P(0)" value={p0} color="bg-quantum-accent2" />
+            <div className="h-3" />
+            <ProbBar label="P(1)" value={p1} color="bg-quantum-accent" />
+          </div>
         </div>
       </div>
 
-      {showAmps && (
-        <div className="mt-4">
-          <AmplitudeBars amplitudes={amplitudes} />
-        </div>
-      )}
+      <div className="mt-4">
+        <AmplitudeBars amplitudes={amplitudes} />
+      </div>
+    </div>
+  );
+}
+
+function ProbBar({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div>
+      <div className="flex justify-between text-sm mb-1.5">
+        <span className="text-gray-400">{label}</span>
+        <span className="font-mono text-gray-200">{(value * 100).toFixed(1)}%</span>
+      </div>
+      <div className="h-2.5 rounded-full bg-white/10 overflow-hidden">
+        <div className={`h-full ${color} transition-all duration-300`} style={{ width: `${value * 100}%` }} />
+      </div>
     </div>
   );
 }

@@ -39,29 +39,29 @@ export function ExercisesPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-2">Exercises</h1>
-      <p className="text-gray-400 mb-6">
+      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Exercises</h1>
+      <p className="text-gray-400 mb-6 text-[15px]">
         Build the requested circuit in the composer and validate it. Solutions are checked up to
         global phase, so any equivalent construction is accepted.
       </p>
 
-      {error && <p className="text-sm text-red-400 mb-4">{error}</p>}
+      {error && <p className="text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-4">{error}</p>}
 
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="space-y-2">
+      <div className="grid md:grid-cols-3 gap-5 md:gap-6">
+        <div className="flex md:block gap-2 overflow-x-auto md:space-y-2 pb-1 md:pb-0">
           {exercises.map((ex) => (
             <button
               key={ex.id}
               onClick={() => pick(ex)}
-              className={`w-full text-left p-3 rounded-lg border ${
+              className={`shrink-0 md:w-full text-left p-3 rounded-xl border transition-colors ${
                 selected?.id === ex.id
                   ? "border-quantum-accent bg-quantum-accent/10"
                   : "border-white/10 bg-quantum-panel/40 hover:border-white/30"
               }`}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 justify-between">
                 <span className="text-sm font-semibold text-white">{ex.title}</span>
-                {completedExercises[ex.id] && <span className="text-green-400 text-xs">✓</span>}
+                {completedExercises[ex.id] && <span className="text-quantum-accent2 text-xs">✓</span>}
               </div>
               <span className="text-xs text-gray-500 capitalize">{ex.difficulty}</span>
             </button>
@@ -71,7 +71,7 @@ export function ExercisesPage() {
         <div className="md:col-span-2">
           {selected ? (
             <div className="space-y-4">
-              <div className="rounded-xl bg-quantum-panel/60 border border-white/10 p-4">
+              <div className="card p-4">
                 <h3 className="font-semibold text-white mb-1">{selected.title}</h3>
                 <p className="text-sm text-gray-300">{selected.prompt}</p>
               </div>
@@ -79,34 +79,28 @@ export function ExercisesPage() {
               <Composer circuit={circuit} onChange={setCircuit} />
 
               <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={validate}
-                  className="px-4 py-2 rounded bg-quantum-accent2 text-black font-semibold"
-                >
+                <button onClick={validate} className="btn-accent">
                   Check solution
                 </button>
                 {showHints < selected.hints.length && (
-                  <button
-                    onClick={() => setShowHints((h) => h + 1)}
-                    className="px-4 py-2 rounded bg-white/10 hover:bg-white/20 text-sm"
-                  >
+                  <button onClick={() => setShowHints((h) => h + 1)} className="btn-ghost">
                     Show hint ({showHints + 1}/{selected.hints.length})
                   </button>
                 )}
               </div>
 
               {selected.hints.slice(0, showHints).map((h, i) => (
-                <p key={i} className="text-sm text-amber-300 bg-amber-500/10 rounded px-3 py-2">
+                <p key={i} className="text-sm text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
                   💡 {h}
                 </p>
               ))}
 
               {feedback && (
                 <p
-                  className={`text-sm rounded px-3 py-2 ${
+                  className={`text-sm rounded-lg px-3 py-2 border ${
                     feedback.passed
-                      ? "text-green-300 bg-green-500/10"
-                      : "text-red-300 bg-red-500/10"
+                      ? "text-green-300 bg-green-500/10 border-green-500/20"
+                      : "text-red-300 bg-red-500/10 border-red-500/20"
                   }`}
                 >
                   {feedback.passed ? "✓ " : "✗ "}

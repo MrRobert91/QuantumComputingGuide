@@ -6,25 +6,133 @@
   color-scheme: dark;
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
 body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background-color: #0b0f1a;
-  color: #e5e7eb;
+  /* Prevent horizontal overflow / forced zoom on mobile. */
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: theme("fontFamily.sans");
+  background:
+    radial-gradient(1200px 600px at 100% -10%, rgba(124, 108, 255, 0.12), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(45, 212, 191, 0.08), transparent 55%),
+    #070a13;
+  background-attachment: fixed;
+  color: #e6e8ef;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Avoid iOS auto-zoom on focusing inputs (font-size must be >= 16px). */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #26304a;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #344063;
+  background-clip: content-box;
+}
+
+/* Accessible focus rings */
+:where(button, a, input, select, [tabindex]):focus-visible {
+  outline: 2px solid theme("colors.quantum.accent2");
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-white/10 bg-quantum-panel/70 backdrop-blur-sm shadow-card;
+  }
+  .card-muted {
+    @apply rounded-xl border border-white/10 bg-black/25;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium
+           transition-colors duration-150 select-none disabled:opacity-50 disabled:cursor-not-allowed;
+    min-height: 40px;
+  }
+  .btn-primary {
+    @apply btn bg-quantum-accent text-white hover:bg-quantum-accent/85 shadow-glow;
+  }
+  .btn-accent {
+    @apply btn bg-quantum-accent2 text-black font-semibold hover:bg-quantum-accent2/85;
+  }
+  .btn-ghost {
+    @apply btn bg-white/5 text-gray-200 hover:bg-white/10 border border-white/10;
+  }
+  .btn-danger {
+    @apply btn bg-red-500/20 text-red-200 hover:bg-red-500/30 border border-red-500/30;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+           bg-quantum-accent/15 text-quantum-accent2 border border-quantum-accent/20;
+  }
+
+  /* Square, touch-friendly gate button */
+  .gate-btn {
+    @apply inline-flex items-center justify-center rounded-lg font-mono text-sm
+           transition-colors duration-150 select-none;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0 0.5rem;
+  }
 }
 
 /* Markdown prose styling for theory pages */
-.prose-quantum h1 { @apply text-3xl font-bold mt-2 mb-4 text-white; }
-.prose-quantum h2 { @apply text-2xl font-semibold mt-8 mb-3 text-white; }
-.prose-quantum h3 { @apply text-xl font-semibold mt-6 mb-2 text-quantum-accent2; }
+.prose-quantum {
+  @apply text-[15px] leading-7;
+}
+.prose-quantum h1 { @apply text-3xl sm:text-4xl font-bold tracking-tight mt-1 mb-5 text-white; }
+.prose-quantum h2 { @apply text-2xl font-semibold tracking-tight mt-10 mb-3 text-white; }
+.prose-quantum h3 { @apply text-lg font-semibold mt-7 mb-2 text-quantum-accent2; }
 .prose-quantum p { @apply my-3 leading-7 text-gray-300; }
-.prose-quantum ul { @apply list-disc pl-6 my-3 text-gray-300 space-y-1; }
-.prose-quantum ol { @apply list-decimal pl-6 my-3 text-gray-300 space-y-1; }
-.prose-quantum code { @apply bg-black/40 px-1.5 py-0.5 rounded text-quantum-accent2 text-sm; }
-.prose-quantum pre { @apply bg-black/50 p-4 rounded-lg overflow-x-auto my-4 text-sm; }
+.prose-quantum ul { @apply list-disc pl-6 my-3 text-gray-300 space-y-1.5; }
+.prose-quantum ol { @apply list-decimal pl-6 my-3 text-gray-300 space-y-1.5; }
+.prose-quantum li::marker { @apply text-quantum-accent; }
+.prose-quantum code {
+  @apply bg-quantum-accent/10 px-1.5 py-0.5 rounded text-quantum-accent2 text-[0.85em] font-mono;
+}
+.prose-quantum pre {
+  @apply bg-black/50 border border-white/10 p-4 rounded-xl overflow-x-auto my-4 text-sm;
+  -webkit-overflow-scrolling: touch;
+}
 .prose-quantum pre code { @apply bg-transparent p-0 text-gray-200; }
-.prose-quantum a { @apply text-quantum-accent underline hover:text-quantum-accent2; }
-.prose-quantum blockquote { @apply border-l-4 border-quantum-accent pl-4 italic text-gray-400 my-4; }
-.prose-quantum table { @apply w-full my-4 border-collapse text-sm; }
+.prose-quantum a { @apply text-quantum-accent underline decoration-quantum-accent/40 underline-offset-2 hover:text-quantum-accent2; }
+.prose-quantum blockquote {
+  @apply border-l-4 border-quantum-accent/60 bg-white/[0.03] rounded-r-lg pl-4 pr-3 py-2 text-gray-400 my-4;
+}
+/* Tables scroll horizontally instead of forcing page zoom on mobile */
+.prose-quantum table {
+  @apply my-4 border-collapse text-sm;
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+}
 .prose-quantum th, .prose-quantum td { @apply border border-white/10 px-3 py-2 text-left; }
+.prose-quantum th { @apply bg-white/5 text-gray-200; }
 .prose-quantum strong { @apply text-white; }

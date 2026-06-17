@@ -22,7 +22,7 @@ export function LessonPage() {
   return (
     <article>
       {lesson.status === "scaffold" && (
-        <p className="text-xs text-amber-400 bg-amber-500/10 rounded px-3 py-2 mb-4">
+        <p className="text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 mb-4">
           This lesson is a scaffold — objectives and links are in place, full content coming soon.
         </p>
       )}
@@ -31,28 +31,26 @@ export function LessonPage() {
 
       {lesson.widget && <InteractiveQubit variant={lesson.widget} />}
 
-      <div className="flex items-center justify-between mt-10 pt-6 border-t border-white/10">
-        <div>
-          {prev && (
-            <Link to={`/lesson/${prev.id}`} className="text-sm text-gray-400 hover:text-white">
-              ← {prev.title}
-            </Link>
-          )}
+      <div className="mt-10 pt-6 border-t border-white/10">
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={() => markLesson(lesson.id, !done)}
+            className={done ? "btn bg-quantum-accent2/20 text-quantum-accent2 border border-quantum-accent2/30" : "btn-primary"}
+          >
+            {done ? "✓ Completed" : "Mark as complete"}
+          </button>
         </div>
-        <button
-          onClick={() => markLesson(lesson.id, !done)}
-          className={`px-4 py-2 rounded text-sm font-semibold ${
-            done ? "bg-green-500/30 text-green-300" : "bg-quantum-accent text-white"
-          }`}
-        >
-          {done ? "✓ Completed" : "Mark as complete"}
-        </button>
-        <div>
-          {next && (
-            <Link to={`/lesson/${next.id}`} className="text-sm text-gray-400 hover:text-white">
-              {next.title} →
+        <div className="flex items-center justify-between gap-3 text-sm">
+          {prev ? (
+            <Link to={`/lesson/${prev.id}`} className="btn-ghost !py-1.5 text-left max-w-[45%]">
+              <span className="truncate">← {prev.title}</span>
             </Link>
-          )}
+          ) : <span />}
+          {next ? (
+            <Link to={`/lesson/${next.id}`} className="btn-ghost !py-1.5 text-right max-w-[45%]">
+              <span className="truncate">{next.title} →</span>
+            </Link>
+          ) : <span />}
         </div>
       </div>
     </article>

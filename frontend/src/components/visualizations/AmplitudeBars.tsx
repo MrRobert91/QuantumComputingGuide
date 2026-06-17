@@ -13,12 +13,12 @@ function phaseColor(phase: number): string {
 export function AmplitudeBars({ amplitudes }: Props) {
   const max = Math.max(...amplitudes.map((a) => a.probability), 1e-9);
   return (
-    <div className="rounded-xl bg-black/30 border border-white/10 p-4">
-      <div className="flex items-center justify-between mb-3">
+    <div className="card-muted p-4">
+      <div className="flex items-center justify-between mb-3 gap-2">
         <h4 className="text-sm font-semibold text-gray-300">Statevector amplitudes</h4>
-        <span className="text-xs text-gray-500">bar = probability · color = phase</span>
+        <span className="text-[11px] text-gray-500 text-right">bar = probability · color = phase</span>
       </div>
-      <div className="flex items-end gap-3 h-44">
+      <div className="flex items-end gap-2 sm:gap-3 h-44 overflow-x-auto">
         {amplitudes.map((a) => (
           <div key={a.basis} className="flex flex-col items-center flex-1 min-w-[2.5rem]">
             <span className="text-xs text-gray-400 mb-1">
@@ -26,7 +26,7 @@ export function AmplitudeBars({ amplitudes }: Props) {
             </span>
             <div className="w-full flex items-end h-full">
               <div
-                className="w-full rounded-t"
+                className="w-full rounded-t-md transition-all duration-500"
                 style={{
                   height: `${(a.probability / max) * 100}%`,
                   backgroundColor: phaseColor(a.phase),
