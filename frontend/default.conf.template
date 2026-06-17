@@ -1,0 +1,33 @@
+# Rendered at container start by the nginx image's envsubst step
+# (/docker-entrypoint.d/20-envsubst-on-templates.sh): ${BACKEND_URL} is replaced
+# with the BACKEND_URL environment variable, producing /etc/nginx/conf.d/default.conf.
+#
+# Set BACKEND_URL to the backend's base origin, with NO trailing slash and NO /api,
+# e.g.  https://my-backend.sliplane.app   or   http://backend:8000  (docker compose).
+#
+# Only ${BACKEND_URL} is substituted; nginx's own lowercase variables such as
+# $host, $uri and $remote_addr are left untouched.
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # SPA routing: fall back to index.html for client-side routes.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Proxy API calls to the backend service.
+    # Host header is intentionally left as the upstream's (from BACKEND_URL) so that
+    # platforms which route by Host (e.g. Sliplane) reach the right service. SNI is
+    # enabled for HTTPS upstreams.
+    location /api/ {
+        proxy_pass ${BACKEND_URL}/api/;
+        proxy_ssl_server_name on;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120s;
+    }
+}
