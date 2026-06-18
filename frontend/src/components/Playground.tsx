@@ -75,22 +75,22 @@ export function Playground({ initialCircuit }: Props) {
 
   return (
     <div className="grid lg:grid-cols-2 gap-5 lg:gap-6">
-      <div>
+      <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2 mb-3">
           {/* Segmented tabs */}
-          <div className="inline-flex rounded-lg bg-black/30 border border-white/10 p-1">
+          <div className="inline-flex rounded-xl bg-black/30 border border-white/10 p-1">
             <button
               onClick={() => setTab("composer")}
-              className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
-                tab === "composer" ? "bg-quantum-accent text-white" : "text-gray-300 hover:text-white"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                tab === "composer" ? "bg-quantum-accent text-white shadow-glow" : "text-gray-300 hover:text-white"
               }`}
             >
               Composer
             </button>
             <button
               onClick={() => setTab("code")}
-              className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
-                tab === "code" ? "bg-quantum-accent text-white" : "text-gray-300 hover:text-white"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                tab === "code" ? "bg-quantum-accent text-white shadow-glow" : "text-gray-300 hover:text-white"
               }`}
             >
               Code
@@ -154,13 +154,16 @@ export function Playground({ initialCircuit }: Props) {
         )}
       </div>
 
-      <div>
+      <div className="min-w-0">
         {result ? (
           <ResultPanel result={result} />
         ) : (
-          <div className="rounded-2xl border border-dashed border-white/15 p-8 text-center text-gray-500">
-            Build a circuit and press <span className="text-quantum-accent2 font-medium">Run</span> to
-            see measurement counts, amplitudes, and Bloch spheres.
+          <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] p-6 sm:p-8 text-center text-gray-500">
+            <div className="text-3xl mb-3 animate-float">⚛️</div>
+            <p className="text-[15px] leading-7">
+              Build a circuit and press <span className="text-quantum-accent2 font-medium">Run</span> to
+              see measurement counts, amplitudes, and Bloch spheres.
+            </p>
           </div>
         )}
       </div>
