@@ -4,6 +4,9 @@
 
 :root {
   color-scheme: dark;
+  /* Safe-area helpers for notched / gesture-bar phones */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 * {
@@ -11,18 +14,24 @@
 }
 
 html,
-body {
+body,
+#root {
   margin: 0;
   /* Prevent horizontal overflow / forced zoom on mobile. */
+  width: 100%;
   max-width: 100%;
   overflow-x: hidden;
 }
 
 body {
   font-family: theme("fontFamily.sans");
+  /* Slightly larger, comfortable base size for mobile reading. */
+  font-size: 16px;
+  line-height: 1.6;
   background:
-    radial-gradient(1200px 600px at 100% -10%, rgba(124, 108, 255, 0.12), transparent 60%),
-    radial-gradient(900px 500px at -10% 10%, rgba(45, 212, 191, 0.08), transparent 55%),
+    radial-gradient(1200px 600px at 100% -10%, rgba(124, 108, 255, 0.14), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(45, 212, 191, 0.09), transparent 55%),
+    radial-gradient(700px 500px at 50% 120%, rgba(244, 114, 182, 0.06), transparent 60%),
     #070a13;
   background-attachment: fixed;
   color: #e6e8ef;
@@ -57,7 +66,7 @@ textarea {
 :where(button, a, input, select, [tabindex]):focus-visible {
   outline: 2px solid theme("colors.quantum.accent2");
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 @layer components {
@@ -68,45 +77,74 @@ textarea {
     @apply rounded-xl border border-white/10 bg-black/25;
   }
 
+  /* Buttons — 44px min tap target (Apple HIG) for premium mobile feel. */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium
-           transition-colors duration-150 select-none disabled:opacity-50 disabled:cursor-not-allowed;
-    min-height: 40px;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 text-[15px] font-medium
+           transition-all duration-150 select-none active:scale-[0.97]
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+    min-height: 44px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
   .btn-primary {
     @apply btn bg-quantum-accent text-white hover:bg-quantum-accent/85 shadow-glow;
   }
   .btn-accent {
-    @apply btn bg-quantum-accent2 text-black font-semibold hover:bg-quantum-accent2/85;
+    @apply btn bg-quantum-accent2 text-black font-semibold hover:bg-quantum-accent2/85 shadow-glow-teal;
   }
   .btn-ghost {
-    @apply btn bg-white/5 text-gray-200 hover:bg-white/10 border border-white/10;
+    @apply btn bg-white/[0.06] text-gray-200 hover:bg-white/[0.12] border border-white/10;
   }
   .btn-danger {
-    @apply btn bg-red-500/20 text-red-200 hover:bg-red-500/30 border border-red-500/30;
+    @apply btn bg-red-500/15 text-red-200 hover:bg-red-500/25 border border-red-500/30;
   }
 
   .chip {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium
            bg-quantum-accent/15 text-quantum-accent2 border border-quantum-accent/20;
   }
 
-  /* Square, touch-friendly gate button */
+  /* Square, touch-friendly gate button — larger on mobile. */
   .gate-btn {
-    @apply inline-flex items-center justify-center rounded-lg font-mono text-sm
-           transition-colors duration-150 select-none;
-    min-width: 40px;
-    min-height: 40px;
-    padding: 0 0.5rem;
+    @apply inline-flex items-center justify-center rounded-xl font-mono text-[15px] font-medium
+           transition-all duration-150 select-none active:scale-95;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 0.625rem;
+  }
+
+  /* Bottom-nav tab item (mobile primary navigation) */
+  .tab-item {
+    @apply flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 text-[11px] font-medium
+           text-gray-500 transition-colors duration-150 active:scale-95;
+    min-height: 52px;
+  }
+  .tab-item-active {
+    @apply text-white;
   }
 }
 
-/* Markdown prose styling for theory pages */
-.prose-quantum {
-  @apply text-[15px] leading-7;
+@layer utilities {
+  .pt-safe {
+    padding-top: var(--safe-top);
+  }
+  .pb-safe {
+    padding-bottom: var(--safe-bottom);
+  }
+  .h-safe-bottom {
+    height: var(--safe-bottom);
+  }
+  .text-gradient {
+    @apply bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent;
+  }
 }
-.prose-quantum h1 { @apply text-3xl sm:text-4xl font-bold tracking-tight mt-1 mb-5 text-white; }
-.prose-quantum h2 { @apply text-2xl font-semibold tracking-tight mt-10 mb-3 text-white; }
+
+/* Markdown prose styling for theory pages — mobile-first sizes. */
+.prose-quantum {
+  @apply text-[16px] leading-7;
+}
+.prose-quantum h1 { @apply text-[28px] sm:text-4xl font-bold tracking-tight leading-tight mt-1 mb-5 text-white; }
+.prose-quantum h2 { @apply text-[22px] sm:text-2xl font-semibold tracking-tight mt-9 mb-3 text-white; }
 .prose-quantum h3 { @apply text-lg font-semibold mt-7 mb-2 text-quantum-accent2; }
 .prose-quantum p { @apply my-3 leading-7 text-gray-300; }
 .prose-quantum ul { @apply list-disc pl-6 my-3 text-gray-300 space-y-1.5; }

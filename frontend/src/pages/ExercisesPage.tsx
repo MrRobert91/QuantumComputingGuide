@@ -68,7 +68,7 @@ export function ExercisesPage() {
           ))}
         </div>
 
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 min-w-0">
           {selected ? (
             <div className="space-y-4">
               <div className="card p-4">
